@@ -11,6 +11,7 @@ y: Signal 2 (size: number of trials x number of time points)
 nw: Time-half-bandwidth product (scalar)
 fs: Sampling frequency in Hz (scalar)
 doPLV: Indicates whether to compute PLV (doPLV == true) or coherence (doPLV == false)
+fmin: Minimum frequency of interest in Hz (scalar)
 fmax: Maximum frequency of interest in Hz (scalar)
 
 OUTPUTS:
@@ -37,14 +38,14 @@ import numpy as np
 from anlffr.dpss import dpss_windows
 from scipy.fft import fft
 
-def mtcoh(x, y, nw, fs, doPLV, fmax):
+def mtcoh(x, y, nw, fs, doPLV, fmin, fmax):
     ntrials = x.shape[0]
     ntime = x.shape[1]
     ntapers = 2*nw-1
     [list_tapers,temp] = dpss_windows(ntime,nw,ntapers)
     nfft = int(2**np.ceil(np.log2(ntime)))
     freqs = np.arange(0,nfft)*fs/nfft
-    freqinds = (freqs<=fmax)
+    freqinds = (freqs>=fmin)&(freqs<=fmax)
     freqs = freqs[freqinds]
     nfreqs = freqs.shape[0]
     PLV = np.zeros((ntapers,nfreqs))

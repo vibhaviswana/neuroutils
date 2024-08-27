@@ -17,8 +17,9 @@ for rho = rhos
     
     nw = 3;
     doPLV = false;
+    fmin = 0;
     fmax = 200;
-    [C, f] = mtcoh(x, y, nw, fs, doPLV, fmax);
+    [C, f] = mtcoh(x, y, nw, fs, doPLV, fmin, fmax);
     
     plot(f, C);
     hold on;

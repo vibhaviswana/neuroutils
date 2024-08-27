@@ -22,9 +22,9 @@ for rho in rhos:
     y = rho * x + rhoflip * np.random.randn(ntrials, t.shape[0])
     
     nw = 3
-    doPLV = True
-    fmax = 200.
-    C, f = mtcoh(x, y, nw, fs, doPLV, fmax)
+    doPLV = False
+    fmin, fmax = 0., 200.
+    C, f = mtcoh(x, y, nw, fs, doPLV, fmin, fmax)
     
     pl.plot(f, C)
 #end

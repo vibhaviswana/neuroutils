@@ -1,4 +1,4 @@
-function [outp,freqs] = mtcoh(x, y, nw, fs, doPLV, fmax)
+function [outp,freqs] = mtcoh(x, y, nw, fs, doPLV, fmin, fmax)
 %
 % Computes either multi-tapered phase locking value (PLV) or coherence between 
 % a given pair of signals. 
@@ -10,6 +10,7 @@ function [outp,freqs] = mtcoh(x, y, nw, fs, doPLV, fmax)
 % nw: Time-half-bandwidth product (scalar)
 % fs: Sampling frequency in Hz (scalar)
 % doPLV: Indicates whether to compute PLV (doPLV == true) or coherence (doPLV == false)
+% fmin: Minimum frequency of interest in Hz (scalar)
 % fmax: Maximum frequency of interest in Hz (scalar)
 %
 % OUTPUTS:
@@ -37,7 +38,7 @@ ntaps = 2*nw-1;
 list_taps = dpss(ntime,nw,ntaps);
 nfft = 2^nextpow2(ntime);
 freqs = (0:(nfft-1))*fs/nfft;
-freqs = freqs(freqs<=fmax);
+freqs = freqs((freqs>=fmin)&(freqs<=fmax));
 nfreqs = numel(freqs);
 PLV = zeros(ntaps,nfreqs);
 Sxy = zeros(ntaps,nfreqs);
