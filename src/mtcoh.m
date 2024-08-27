@@ -2,7 +2,7 @@ function [outp,freqs] = mtcoh(x, y, nw, fs, doPLV, fmax)
 %
 % Computes either multi-tapered phase locking value (PLV) or coherence between 
 % a given pair of signals. 
-% Copyright 2019-23 Vibha Viswanathan. All rights reserved.
+% Copyright 2019-24 Vibha Viswanathan. All rights reserved.
 %
 % INPUTS:
 % x: Signal 1 (size: number of trials x number of time points)
@@ -39,7 +39,10 @@ nfft = 2^nextpow2(ntime);
 freqs = (0:(nfft-1))*fs/nfft;
 freqs = freqs(freqs<=fmax);
 nfreqs = numel(freqs);
-coh = zeros(ntaps,nfreqs);
+PLV = zeros(ntaps,nfreqs);
+Sxy = zeros(ntaps,nfreqs);
+Sxx = zeros(ntaps,nfreqs);
+Syy = zeros(ntaps,nfreqs);
 
 for k = 1:ntaps
     tap = (repmat(list_taps(:,k),1,ntrials))';
@@ -47,14 +50,18 @@ for k = 1:ntaps
     Yf = fft(tap.*y,nfft,2);
     Xf = Xf(:,1:nfreqs);
     Yf = Yf(:,1:nfreqs);
-    Yf = conj(Yf);
     if ~doPLV
-        coh(k,:) = abs(mean(Xf.*Yf,1)./mean(abs(Xf).*abs(Yf),1)); 
+        Sxy(k,:) = abs(mean(Xf.*conj(Yf),1));
+        Sxx(k,:) = abs(mean(Xf.*conj(Xf),1));
+        Syy(k,:) = abs(mean(Yf.*conj(Yf),1));
     elseif doPLV
-        coh(k,:) = abs(mean((Xf./abs(Xf)) .* (Yf./abs(Yf)),1)); 
+        PLV(k,:) = abs(mean((Xf./abs(Xf)) .* (conj(Yf)./abs(Yf)),1)); 
     end
-    
 end
-outp = mean(coh,1);
 
+if ~doPLV
+    outp = mean(Sxy,1)./sqrt(mean(Sxx,1).*mean(Syy,1));
+elseif doPLV
+    outp = mean(PLV,1);
+end
 
